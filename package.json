@@ -1,0 +1,29 @@
+{
+  "name": "gameoff-2021-bichoides",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/elmiguedev/gameoff-2021-bichoides.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/elmiguedev/gameoff-2021-bichoides/issues"
+  },
+  "homepage": "https://github.com/elmiguedev/gameoff-2021-bichoides#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "phaser": "^3.55.2"
+  },
+  "devDependencies": {
+    "dotenv": "^10.0.0",
+    "nodemon": "^2.0.15",
+    "parcel": "^2.0.1"
+  }
+}
