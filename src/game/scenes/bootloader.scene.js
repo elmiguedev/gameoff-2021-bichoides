@@ -1,7 +1,11 @@
 import { Scene } from "phaser"
 
+// ui assets
 import PixelFontPng from "../assets/fonts/slkscr_0.png";
 import PixelFontFnt from "../assets/fonts/slkscr.fnt";
+
+// entities assets
+import BichoidePng from "../assets/img/bugs/bichoide.png";
 
 export default class BootloaderScene extends Scene {
     constructor(){
@@ -13,8 +17,12 @@ export default class BootloaderScene extends Scene {
         // fonts
         this.load.bitmapFont("PixelFont",PixelFontPng,PixelFontFnt);
 
+        // bugs
+        this.load.image("Bichoide",BichoidePng);
+
+        // load handler
         this.load.on("complete", () => {
-            this.scene.start("MainScene");
+            this.scene.start("WorldScene");
         })
     }
 

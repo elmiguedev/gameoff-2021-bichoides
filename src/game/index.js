@@ -1,6 +1,7 @@
 import { Game } from "phaser";
+import WorldHud from "./huds/world.hud";
 import BootloaderScene from "./scenes/bootloader.scene";
-import MainScene from "./scenes/main.scene";
+import WorldScene from "./scenes/world.scene";
 
 if (module.hot) {
     module.hot.accept(function () {
@@ -28,6 +29,7 @@ export default new Game({
     },
     scene: [
         BootloaderScene,
-        MainScene
+        WorldScene,
+        WorldHud
     ]
 });
