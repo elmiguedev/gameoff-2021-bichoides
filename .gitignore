@@ -1,4 +1,6 @@
 node_modules
+src/public
+
 # Logs
 logs
 *.log
