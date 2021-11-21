@@ -1,10 +1,10 @@
 {
   "name": "gameoff-2021-bichoides",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/index.js"
+    "dev": "pnpm dev-game & pnpm dev-server",
+    "dev-server": "nodemon src/index.js",
+    "dev-game": "parcel watch src/game/index.html --dist-dir src/public",
+    "dev-game-only": "parcel src/game/index.html --dist-dir src/public"
   },
   "repository": {
     "type": "git",
@@ -18,10 +18,12 @@
   },
   "homepage": "https://github.com/elmiguedev/gameoff-2021-bichoides#readme",
   "dependencies": {
+    "@parcel/config-default": "^2.0.1",
     "express": "^4.17.1",
     "phaser": "^3.55.2"
   },
   "devDependencies": {
+    "@parcel/transformer-raw": "^2.0.1",
     "dotenv": "^10.0.0",
     "nodemon": "^2.0.15",
     "parcel": "^2.0.1"
