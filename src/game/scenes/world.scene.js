@@ -27,6 +27,7 @@ export default class WorldScene extends Scene {
     }
 
     update() {
+        this.checkPointer();
         this.checkBugPosition();
         this.bug.update();
     }
@@ -54,17 +55,17 @@ export default class WorldScene extends Scene {
     createControls() {
         this.targetMark = this.add.bitmapText(0, 0, "PixelFont", "x").setOrigin(0.5);
         this.targetMark.setVisible(false);
-        this.input.on('pointerdown', (pointer) => {
-            if (!this.target) {
-                this.target = new Phaser.Math.Vector2();
-            }
-            this.target.x = pointer.worldX;
-            this.target.y = pointer.worldY;
-            this.targetMark.x = pointer.worldX;
-            this.targetMark.y = pointer.worldY;
-            this.targetMark.setVisible(true);
-            this.physics.moveToObject(this.bug, this.target, 20);
-        });
+        // this.input.on('pointerdown', (pointer) => {
+        //     if (!this.target) {
+        //         this.target = new Phaser.Math.Vector2();
+        //     }
+        //     this.target.x = pointer.worldX;
+        //     this.target.y = pointer.worldY;
+        //     this.targetMark.x = pointer.worldX;
+        //     this.targetMark.y = pointer.worldY;
+        //     this.targetMark.setVisible(true);
+        //     this.physics.moveToObject(this.bug, this.target, 20);
+        // });
     }
 
     createSocket() {
@@ -136,6 +137,22 @@ export default class WorldScene extends Scene {
                     this.targetMark.setVisible(false);
                 }
             }
+        }
+    }
+
+    checkPointer() {
+        const pointer = this.input.activePointer;
+        if (pointer.isDown) {
+            if (!this.target) {
+                this.target = new Phaser.Math.Vector2();
+            }
+            this.target.x = pointer.worldX;
+            this.target.y = pointer.worldY;
+            this.targetMark.x = pointer.worldX;
+            this.targetMark.y = pointer.worldY;
+            this.targetMark.setVisible(true);
+            this.physics.moveToObject(this.bug, this.target, 20);
+            // ...
         }
     }
 
