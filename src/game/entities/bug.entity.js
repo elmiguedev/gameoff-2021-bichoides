@@ -26,6 +26,11 @@ export default class Bug extends Physics.Arcade.Sprite {
         this.nameTag.setOrigin(0.5);
     }
 
+    destroy() {
+        super.destroy(true);
+        this.nameTag.destroy();
+    }
+
     // dynamic and check methods
     // --------------------------
     updateNameTagPosition() {
