@@ -2,7 +2,7 @@
   "name": "gameoff-2021-bichoides",
   "scripts": {
     "start": "npm run build-game && node src/index.js",
-    "build-game": "parcel build src/game/index.html --dist-dir src/public",
+    "build-game": "parcel build src/game/index.html --dist-dir src/public --public-url \".\"",
     "dev": "pnpm dev-game & pnpm dev-server",
     "dev-server": "nodemon src/index.js",
     "dev-game": "parcel watch src/game/index.html --dist-dir src/public",
