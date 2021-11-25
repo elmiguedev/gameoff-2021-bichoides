@@ -1,5 +1,7 @@
 import { Scene } from "phaser";
 import Bug from "../entities/bug.entity";
+import io from "socket.io/client-dist/socket.io";
+import Grass from "../entities/grass.entity";
 
 export default class WorldScene extends Scene {
     constructor() {
@@ -14,8 +16,14 @@ export default class WorldScene extends Scene {
         this.createBug();
         this.createHud();
         this.createControls();
+        this.createSocket();
 
-        this.add.rectangle(20, 20, 12, 12, 0x111111);
+        for (let i = 0; i < 128; i++) {
+            const x = Phaser.Math.Between(-128, 128);
+            const y = Phaser.Math.Between(-128, 128);
+            const grass = new Grass(this, x, y);
+        }
+
     }
 
     update() {
@@ -28,6 +36,8 @@ export default class WorldScene extends Scene {
 
     createBackground() {
         this.cameras.main.setBackgroundColor(0xa6cb96);
+        this.cameras.main.setZoom(2);
+
     }
 
     createBug() {
@@ -42,14 +52,77 @@ export default class WorldScene extends Scene {
     }
 
     createControls() {
+        this.targetMark = this.add.bitmapText(0, 0, "PixelFont", "x").setOrigin(0.5);
+        this.targetMark.setVisible(false);
         this.input.on('pointerdown', (pointer) => {
             if (!this.target) {
                 this.target = new Phaser.Math.Vector2();
             }
             this.target.x = pointer.worldX;
             this.target.y = pointer.worldY;
+            this.targetMark.x = pointer.worldX;
+            this.targetMark.y = pointer.worldY;
+            this.targetMark.setVisible(true);
             this.physics.moveToObject(this.bug, this.target, 20);
         });
+    }
+
+    createSocket() {
+        this.enemies = this.physics.add.group({
+            runChildUpdate: true
+        });
+        this.socket = io();
+        this.socket.on("bug:connected", (data) => {
+            console.log("Se conecta bicho: ", data);
+            if (this.socket.id !== data.id) {
+                this.createEnemyBug(data);
+            }
+        })
+        this.socket.on("world:state", (state) => {
+            for (const id in state) {
+                if (id !== this.socket.id) {
+                    this.createEnemyBug(state[id]);
+                } else {
+                    this.bug.x = state[id].x;
+                    this.bug.y = state[id].y;
+                }
+            }
+            console.log("world:", state)
+        });
+        this.socket.on("bug:disconnected", (data) => {
+            console.log("Se desconecta bicho: ", data);
+            this.destroyEnemyBug(data.id);
+
+        });
+        this.socket.on("bug:position", (data) => {
+            const bug = this.enemies.getMatching("id", data.id)[0];
+            if (bug) {
+                bug.x = data.x;
+                bug.y = data.y;
+            }
+        });
+        this.socket.timer = this.time.addEvent({
+            repeat: -1,
+            delay: 1000 / 30,
+            callback: () => {
+                this.notifyBugPosition();
+            }
+        });
+
+    }
+
+    createEnemyBug(data) {
+        const bug = new Bug(this, data.x, data.y);
+        bug.id = data.id;
+        this.enemies.add(bug);
+    }
+
+    destroyEnemyBug(id) {
+        const bug = this.enemies.getMatching("id", id)[0];
+        if (bug) {
+            bug.destroy();
+        }
+        this.enemies.remove(bug);
     }
 
     // check and dynamic methods
@@ -58,12 +131,20 @@ export default class WorldScene extends Scene {
         if (this.bug && this.target) {
             const distance = Phaser.Math.Distance.Between(this.bug.x, this.bug.y, this.target.x, this.target.y);
             if (this.bug.body.speed > 0) {
-                if (distance < 4) {
+                if (distance < 2) {
                     this.bug.body.reset(this.target.x, this.target.y);
+                    this.targetMark.setVisible(false);
                 }
             }
         }
     }
 
+    notifyBugPosition() {
+        this.socket.emit("bug:position", {
+            id: this.socket.id,
+            x: this.bug.x,
+            y: this.bug.y
+        });
+    }
 
 }

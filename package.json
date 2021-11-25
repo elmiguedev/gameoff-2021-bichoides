@@ -1,6 +1,8 @@
 {
   "name": "gameoff-2021-bichoides",
   "scripts": {
+    "start": "npm run build-game && node src/index.js",
+    "build-game": "parcel build src/game/index.html --dist-dir src/public",
     "dev": "pnpm dev-game & pnpm dev-server",
     "dev-server": "nodemon src/index.js",
     "dev-game": "parcel watch src/game/index.html --dist-dir src/public",
@@ -20,7 +22,8 @@
   "dependencies": {
     "@parcel/config-default": "^2.0.1",
     "express": "^4.17.1",
-    "phaser": "^3.55.2"
+    "phaser": "^3.55.2",
+    "socket.io": "^4.4.0"
   },
   "devDependencies": {
     "@parcel/transformer-raw": "^2.0.1",

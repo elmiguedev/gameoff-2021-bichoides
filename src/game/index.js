@@ -5,13 +5,14 @@ import WorldScene from "./scenes/world.scene";
 
 if (module.hot) {
     module.hot.accept(function () {
-      window.location.reload();
+        window.location.reload();
     });
 }
 
-export default new Game({
-    width: 128,
-    height: 128,
+const game = new Game({
+    type: Phaser.WEBGL,
+    width: window.innerWidth / 4,
+    height: window.innerHeight / 4,
     scale: {
         zoom: 4
     },
@@ -24,7 +25,7 @@ export default new Game({
             gravity: {
                 y: 0,
             },
-            debug: true
+            debug: false
         }
     },
     scene: [
@@ -33,3 +34,11 @@ export default new Game({
         WorldHud
     ]
 });
+
+
+window.addEventListener('resize', () => {
+
+    game.scale.resize(window.innerWidth / 4, window.innerHeight / 4);
+}, false);
+
+export default game;
