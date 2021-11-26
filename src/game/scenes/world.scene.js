@@ -18,11 +18,6 @@ export default class WorldScene extends Scene {
         this.createControls();
         this.createSocket();
 
-        for (let i = 0; i < 128; i++) {
-            const x = Phaser.Math.Between(-128, 128);
-            const y = Phaser.Math.Between(-128, 128);
-            const grass = new Grass(this, x, y);
-        }
 
     }
 
@@ -90,6 +85,9 @@ export default class WorldScene extends Scene {
             }
             console.log("world:", state)
         });
+        this.socket.on("world:chunk", (chunk) => {
+            this.createChunk(chunk);
+        })
         this.socket.on("bug:disconnected", (data) => {
             console.log("Se desconecta bicho: ", data);
             this.destroyEnemyBug(data.id);
@@ -124,6 +122,20 @@ export default class WorldScene extends Scene {
             bug.destroy();
         }
         this.enemies.remove(bug);
+    }
+
+    createChunk(chunk) {
+        for (let i = 0; i < chunk.data.length; i++) {
+            const row = chunk.data[i];
+            for (let j = 0; j < row.length; j++) {
+                const tile = row[j];
+                if (tile === 1) {
+                    const x = chunk.cx * 128 + i * 8;
+                    const y = chunk.cy * 128 + j * 8;
+                    new Grass(this, x, y);
+                }
+            }
+        }
     }
 
     // check and dynamic methods
