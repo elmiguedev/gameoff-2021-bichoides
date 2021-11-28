@@ -43,6 +43,18 @@ io.on("connection", (socket) => {
         })
     });
     socket.on("bug:position", (data) => {
+        // check chunk position
+        const currentChunk = world.getChunkPosition(bugs[socket.id].x, bugs[socket.id].y);
+        const chunkPosition = world.getChunkPosition(data.x, data.y);
+
+        if (currentChunk.x !== chunkPosition.x || currentChunk.y !== chunkPosition.y) {
+            socket.emit("world:chunk", {
+                cx: chunkPosition.x,
+                cy: chunkPosition.y,
+                data: world.getChunk(chunkPosition.x, chunkPosition.y)
+            });
+        }
+
         bugs[socket.id].x = data.x;
         bugs[socket.id].y = data.y;
         io.emit("bug:position", data)

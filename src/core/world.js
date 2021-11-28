@@ -4,6 +4,13 @@ class World {
         this.createWorld();
     }
 
+    getTilePosition(x, y) {
+        return {
+            x: Math.trunc(x / 8),
+            y: Math.trunc(y / 8)
+        }
+    }
+
     getChunkPosition(x, y) {
         return {
             x: Math.trunc(x / 128),

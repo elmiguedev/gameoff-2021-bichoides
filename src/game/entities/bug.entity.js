@@ -8,13 +8,19 @@ export default class Bug extends Physics.Arcade.Sprite {
         this.scene.add.existing(this);
         this.scene.physics.add.existing(this);
 
+        this.canEat = false;
+        this.collideEntity = null;
+
         this.createNameTag();
+        this.createInteractions();
     }
 
     // game loop methods
     // ----------------------
 
     update() {
+        this.pressed = false;
+        this.updateMainProps();
         this.updateNameTagPosition();
     }
 
@@ -24,6 +30,20 @@ export default class Bug extends Physics.Arcade.Sprite {
     createNameTag() {
         this.nameTag = this.scene.add.bitmapText(this.x, this.y - 8, "PixelFont", "Bicho");
         this.nameTag.setOrigin(0.5);
+    }
+
+    createInteractions() {
+        this.setInteractive({ cursor: "pointer" });
+        this.on("pointerdown", (e) => {
+            this.clicked = true;
+        });
+        this.on("pointerout", () => {
+            this.mouseOver = false;
+        })
+        this.on("pointerover", () => {
+            this.mouseOver = true;
+        })
+
     }
 
     destroy() {
@@ -37,5 +57,10 @@ export default class Bug extends Physics.Arcade.Sprite {
         this.nameTag.x = this.x;
         this.nameTag.y = this.y - 8;
     }
+
+    updateMainProps() {
+        this.canEat = false;
+    }
+
 
 }
