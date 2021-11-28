@@ -58,6 +58,11 @@ io.on("connection", (socket) => {
         bugs[socket.id].x = data.x;
         bugs[socket.id].y = data.y;
         io.emit("bug:position", data)
+    });
+    socket.on("bug:eat", (data) => {
+        // update world
+        world.clearPoint(data.x, data.y);
+        io.emit("bug:eat", data);
     })
 })
 

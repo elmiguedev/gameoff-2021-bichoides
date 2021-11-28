@@ -15,6 +15,7 @@ export default class WorldHud extends Scene {
     create() {
         this.position = this.add.bitmapText(10, 10, "PixelFont", "0,0");
         this.interaction = this.add.bitmapText(10, 20, "PixelFont", "");
+        this.tilePosition = this.add.bitmapText(10, 40, "PixelFont", "0,0");
 
     }
 
@@ -34,6 +35,10 @@ export default class WorldHud extends Scene {
 
     setInteractionInfo(name) {
         this.interaction.text = name;
+    }
+
+    setTilePosition(x, y) {
+        this.tilePosition.text = `${x},${y}`;
     }
 
 }

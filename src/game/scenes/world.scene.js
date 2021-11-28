@@ -18,7 +18,6 @@ export default class WorldScene extends Scene {
         this.createControls();
         this.createSocket();
 
-        this.clicked = [];
 
     }
 
@@ -40,6 +39,7 @@ export default class WorldScene extends Scene {
 
     createBug() {
         this.bug = new Bug(this, 10, 10);
+        this.bug.setDepth(3);
         this.cameras.main.startFollow(this.bug);
     }
 
@@ -94,6 +94,14 @@ export default class WorldScene extends Scene {
                 bug.y = data.y;
             }
         });
+        this.socket.on("bug:eat", (data) => {
+            const grass = this.grasses.children.getArray().find(g => g.x === data.x && g.y === data.y);
+            if (grass) {
+                this.grasses.remove(grass);
+                grass.destroy();
+            }
+
+        })
         this.socket.timer = this.time.addEvent({
             repeat: -1,
             delay: 1000 / 30,
@@ -119,16 +127,32 @@ export default class WorldScene extends Scene {
     }
 
     createChunk(chunk) {
+        this.grasses.clear(true);
         for (let i = 0; i < chunk.data.length; i++) {
             const row = chunk.data[i];
             for (let j = 0; j < row.length; j++) {
                 const tile = row[j];
+                const x = chunk.cx * 128 + i * 8;
+                const y = chunk.cy * 128 + j * 8;
                 if (tile === 1) {
-                    const x = chunk.cx * 128 + i * 8;
-                    const y = chunk.cy * 128 + j * 8;
                     const grass = new Grass(this, x, y);
+                    grass.setDepth(2);
                     this.grasses.add(grass);
                 }
+                //  else {
+                //     const tilePosition = {
+                //         x: i + (chunk.cx * 16),
+                //         y: j + (chunk.cy * 16),
+                //     }
+                //     // const tile = this.add.bitmapText(x, y, "PixelFont", `${tilePosition.x},${tilePosition.y}`, -4);
+                //     const tile = this.add.rectangle(x, y, 4, 4, 0xff0000);
+                //     tile.tilePosition = tilePosition;
+                //     this.physics.add.existing(tile);
+                //     this.physics.add.overlap(tile, this.bug, () => {
+                //         this.hud.setTilePosition(tile.tilePosition.x, tile.tilePosition.y);
+
+                //     })
+                // }
             }
         }
     }
@@ -148,10 +172,8 @@ export default class WorldScene extends Scene {
     }
 
     checkPointer() {
-
         const pointer = this.input.activePointer;
         if (pointer.isDown) {
-
             if (this.bug.mouseOver) {
                 console.log("chobi");
             }
@@ -165,20 +187,21 @@ export default class WorldScene extends Scene {
                 this.targetMark.y = pointer.worldY;
                 this.targetMark.setVisible(true);
                 this.physics.moveToObject(this.bug, this.target, 20);
-
             }
-
-
         }
-
     }
 
     checkGrassCollision() {
         this.physics.overlap(this.bug, this.grasses, (bug, grass) => {
-            this.bug.canEat = true;
-            this.bug.collideEntity = grass;
-            this.hud.setInteractionInfo("Grass");
-        })
+            if (this.bug.clicked) {
+                this.bug.eat(grass);
+                this.socket.emit("bug:eat", {
+                    type: "grass",
+                    x: grass.x,
+                    y: grass.y
+                })
+            }
+        });
     }
 
     notifyBugPosition() {

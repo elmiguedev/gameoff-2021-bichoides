@@ -1,54 +1,39 @@
-import { Physics } from "phaser";
+import Entity from "../core/entity";
 
-export default class Bug extends Physics.Arcade.Sprite {
+export default class Bug extends Entity {
     constructor(scene, x, y) {
         super(scene, x, y, "Bichoide");
 
-        this.scene = scene;
-        this.scene.add.existing(this);
-        this.scene.physics.add.existing(this);
-
-        this.canEat = false;
-        this.collideEntity = null;
-
+        this.createMainProperties();
         this.createNameTag();
-        this.createInteractions();
+
     }
 
     // game loop methods
     // ----------------------
 
     update() {
-        this.pressed = false;
         this.updateMainProps();
         this.updateNameTagPosition();
     }
 
     // creation methods
     // ---------------------
+    createMainProperties() {
+    }
 
     createNameTag() {
         this.nameTag = this.scene.add.bitmapText(this.x, this.y - 8, "PixelFont", "Bicho");
         this.nameTag.setOrigin(0.5);
     }
 
-    createInteractions() {
-        this.setInteractive({ cursor: "pointer" });
-        this.on("pointerdown", (e) => {
-            this.clicked = true;
-        });
-        this.on("pointerout", () => {
-            this.mouseOver = false;
-        })
-        this.on("pointerover", () => {
-            this.mouseOver = true;
-        })
-
-    }
-
     destroy() {
         super.destroy(true);
         this.nameTag.destroy();
+    }
+
+    eat(food) {
+        // food.destroy();
     }
 
     // dynamic and check methods
@@ -59,7 +44,7 @@ export default class Bug extends Physics.Arcade.Sprite {
     }
 
     updateMainProps() {
-        this.canEat = false;
+        this.collisionEntities = [];
     }
 
 

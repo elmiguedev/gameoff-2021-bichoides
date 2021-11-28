@@ -4,6 +4,31 @@ class World {
         this.createWorld();
     }
 
+    clearPoint(x, y) {
+        console.log("POSITION", x, y);
+        const chunkPosition = this.getChunkPosition(x, y);
+        const chunkRealPosition = {
+            x: chunkPosition.x * 128,
+            y: chunkPosition.y * 128,
+        }
+        const chunk = this.getChunkFromRealCoords(x, y);
+        const relativePosition = {
+            x: x - chunkRealPosition.x,
+            y: y - chunkRealPosition.y
+        }
+        const relativeTilePosition = {
+            x: relativePosition.x / 8,
+            y: relativePosition.y / 8
+        };
+        console.log("CHUNK POSITION:", chunkPosition);
+        console.log("CHUNK REAL POSITION:", chunkRealPosition);
+        console.log("RELATIVE POSITION:", relativePosition);
+        console.log("TILE POSITION:", relativeTilePosition);
+
+        chunk[relativeTilePosition.x][relativeTilePosition.y] = 0;
+
+    }
+
     getTilePosition(x, y) {
         return {
             x: Math.trunc(x / 8),
