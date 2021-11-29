@@ -56,6 +56,17 @@ export default class Bug extends Entity {
         })
     }
 
+    shake() {
+        this.scene.time.addEvent({
+            repeat: 3,
+            delay: 50,
+            callback: () => {
+                this.x -= Phaser.Math.Between(-4, 4);
+                this.y -= Phaser.Math.Between(-4, 4);
+            }
+        })
+    }
+
     // dynamic and check methods
     // --------------------------
     updateNameTagPosition() {

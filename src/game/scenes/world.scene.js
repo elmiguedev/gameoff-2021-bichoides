@@ -30,6 +30,7 @@ export default class WorldScene extends Scene {
             e.setVelocity(0);
             if (b.onAttack) {
                 this.socket.emit("bug:attack", { id: e.id })
+                e.shake();
             }
         });
     }
