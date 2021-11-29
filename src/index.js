@@ -64,6 +64,10 @@ io.on("connection", (socket) => {
         world.clearPoint(data.x, data.y);
         io.emit("bug:eat", data);
     })
+
+    socket.on("bug:attack", (data) => {
+        io.emit("bug:attack", data);
+    })
 })
 
 // configure endpoints

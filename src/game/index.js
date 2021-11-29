@@ -37,7 +37,6 @@ const game = new Game({
 
 
 window.addEventListener('resize', () => {
-
     game.scale.resize(window.innerWidth / 4, window.innerHeight / 4);
 }, false);
 

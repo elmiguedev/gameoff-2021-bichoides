@@ -26,6 +26,12 @@ export default class WorldScene extends Scene {
         this.checkPointer();
         this.checkBugPosition();
         this.checkGrassCollision();
+        this.physics.collide(this.bug, this.enemies, (b, e) => {
+            e.setVelocity(0);
+            if (b.onAttack) {
+                this.socket.emit("bug:attack", { id: e.id })
+            }
+        });
     }
 
     // creation methods
@@ -88,10 +94,12 @@ export default class WorldScene extends Scene {
 
         });
         this.socket.on("bug:position", (data) => {
-            const bug = this.enemies.getMatching("id", data.id)[0];
-            if (bug) {
-                bug.x = data.x;
-                bug.y = data.y;
+            if (data.id !== this.socket.id) {
+                const bug = this.enemies.getMatching("id", data.id)[0];
+                if (bug) {
+                    bug.x = data.x;
+                    bug.y = data.y;
+                }
             }
         });
         this.socket.on("bug:eat", (data) => {
@@ -101,6 +109,11 @@ export default class WorldScene extends Scene {
                 grass.destroy();
             }
 
+        })
+        this.socket.on("bug:attack", (data) => {
+            if (data.id === this.socket.id) {
+                this.cameras.main.shake();
+            }
         })
         this.socket.timer = this.time.addEvent({
             repeat: -1,
@@ -115,6 +128,20 @@ export default class WorldScene extends Scene {
     createEnemyBug(data) {
         const bug = new Bug(this, data.x, data.y);
         bug.id = data.id;
+        bug.body.setImmovable(true);
+        bug.onDoubleClick = () => {
+            const distance = Phaser.Math.Distance.Between(
+                this.bug.x,
+                this.bug.y,
+                bug.x,
+                bug.y
+            );
+            if (distance < 30 && distance > 10) {
+                this.bug.attack(bug);
+            }
+        }
+
+
         this.enemies.add(bug);
     }
 
@@ -186,8 +213,11 @@ export default class WorldScene extends Scene {
                 this.targetMark.x = pointer.worldX;
                 this.targetMark.y = pointer.worldY;
                 this.targetMark.setVisible(true);
-                this.physics.moveToObject(this.bug, this.target, 20);
+
+                this.bug.move(this.target);
             }
+
+
         }
     }
 

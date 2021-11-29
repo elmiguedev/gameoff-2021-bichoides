@@ -11,6 +11,7 @@ export default class Entity extends Phaser.Physics.Arcade.Sprite {
     createProperties() {
         this.clicked = false;
         this.mouseOver = false;
+        this.lastClick = 0;
     }
 
     createSceneProperties() {
@@ -22,9 +23,18 @@ export default class Entity extends Phaser.Physics.Arcade.Sprite {
         this.setInteractive();
         this.on("pointerdown", (e) => {
             this.clicked = true;
+            let clickDelay = this.scene.time.now - this.lastClick;
+            this.lastClick = this.scene.time.now;
+            if (clickDelay < 350) {
+                this.doubleClicked = true;
+                if (this.onDoubleClick) {
+                    this.onDoubleClick();
+                }
+            }
         });
         this.on("pointerup", (e) => {
             this.clicked = false;
+            this.doubleClicked = false;
         });
         this.on("pointerover", (e) => {
             this.mouseOver = true;

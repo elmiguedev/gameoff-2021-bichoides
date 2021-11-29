@@ -15,11 +15,13 @@ export default class Bug extends Entity {
     update() {
         this.updateMainProps();
         this.updateNameTagPosition();
+        // this.onAttack = false;
     }
 
     // creation methods
     // ---------------------
     createMainProperties() {
+        // this.setDrag(20);
     }
 
     createNameTag() {
@@ -34,6 +36,24 @@ export default class Bug extends Entity {
 
     eat(food) {
         // food.destroy();
+    }
+
+
+    move(target) {
+        if (!this.onAttack)
+            this.scene.physics.moveToObject(this, target, 20);
+    }
+
+    attack(enemy) {
+        this.onAttack = true;
+        this.scene.physics.moveToObject(this, enemy, 60, 100);
+        this.scene.time.addEvent({
+            delay: 100,
+            callback: () => {
+                this.onAttack = false;
+                this.setVelocity(0);
+            }
+        })
     }
 
     // dynamic and check methods

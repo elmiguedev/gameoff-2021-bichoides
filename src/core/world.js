@@ -84,8 +84,8 @@ class World {
 
     getRandomPosition() {
         return {
-            x: this.randomBetween(0, 1280),
-            y: this.randomBetween(0, 1280),
+            x: this.randomBetween(0, 128),
+            y: this.randomBetween(0, 128),
         }
     }
 }
