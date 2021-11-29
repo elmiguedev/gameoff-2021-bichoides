@@ -58,11 +58,11 @@ export default class Bug extends Entity {
 
     shake() {
         this.scene.time.addEvent({
-            repeat: 3,
+            repeat: 4,
             delay: 50,
             callback: () => {
-                this.x -= Phaser.Math.Between(-4, 4);
-                this.y -= Phaser.Math.Between(-4, 4);
+                this.x -= Phaser.Math.Between(-8, 8);
+                this.y -= Phaser.Math.Between(-8, 8);
             }
         })
     }
