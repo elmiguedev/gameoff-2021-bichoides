@@ -25,7 +25,7 @@ const game = new Game({
             gravity: {
                 y: 0,
             },
-            debug: false
+            debug: true
         }
     },
     scene: [

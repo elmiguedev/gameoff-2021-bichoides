@@ -23,16 +23,9 @@ export default class WorldScene extends Scene {
 
     update() {
         this.bug.update();
-        this.checkPointer();
+
         this.checkBugPosition();
-        this.checkGrassCollision();
-        this.physics.collide(this.bug, this.enemies, (b, e) => {
-            e.setVelocity(0);
-            if (b.onAttack) {
-                this.socket.emit("bug:attack", { id: e.id })
-                e.shake();
-            }
-        });
+
     }
 
     // creation methods
@@ -59,6 +52,14 @@ export default class WorldScene extends Scene {
     createControls() {
         this.targetMark = this.add.bitmapText(0, 0, "PixelFont", "x").setOrigin(0.5);
         this.targetMark.setVisible(false);
+        this.input.on("pointerdown", (pointer) => {
+            this.moveBug(pointer)
+        })
+        this.input.on("pointermove", (pointer) => {
+            if (pointer.isDown) {
+                this.moveBug(pointer);
+            }
+        });
     }
 
     createSocket() {
@@ -130,18 +131,7 @@ export default class WorldScene extends Scene {
         const bug = new Bug(this, data.x, data.y);
         bug.id = data.id;
         bug.body.setImmovable(true);
-        bug.onDoubleClick = () => {
-            const distance = Phaser.Math.Distance.Between(
-                this.bug.x,
-                this.bug.y,
-                bug.x,
-                bug.y
-            );
-            if (distance < 30 && distance > 10) {
-                this.bug.attack(bug);
-            }
-        }
-
+        bug.createTriggerZone(10);
 
         this.enemies.add(bug);
     }
@@ -155,7 +145,7 @@ export default class WorldScene extends Scene {
     }
 
     createChunk(chunk) {
-        this.grasses.clear(true);
+        this.grasses.clear(true, true);
         for (let i = 0; i < chunk.data.length; i++) {
             const row = chunk.data[i];
             for (let j = 0; j < row.length; j++) {
@@ -164,25 +154,35 @@ export default class WorldScene extends Scene {
                 const y = chunk.cy * 128 + j * 8;
                 if (tile === 1) {
                     const grass = new Grass(this, x, y);
+                    grass.createTriggerZone(10);
+                    grass.addTriggerListener(this.bug, (grass) => {
+                        this.hud.showActionButton("Comer", () => {
+                            this.socket.emit("bug:eat", {
+                                type: "grass",
+                                x: grass.x,
+                                y: grass.y
+                            })
+                        })
+                    })
                     grass.setDepth(2);
                     this.grasses.add(grass);
                 }
-                //  else {
-                //     const tilePosition = {
-                //         x: i + (chunk.cx * 16),
-                //         y: j + (chunk.cy * 16),
-                //     }
-                //     // const tile = this.add.bitmapText(x, y, "PixelFont", `${tilePosition.x},${tilePosition.y}`, -4);
-                //     const tile = this.add.rectangle(x, y, 4, 4, 0xff0000);
-                //     tile.tilePosition = tilePosition;
-                //     this.physics.add.existing(tile);
-                //     this.physics.add.overlap(tile, this.bug, () => {
-                //         this.hud.setTilePosition(tile.tilePosition.x, tile.tilePosition.y);
-
-                //     })
-                // }
             }
         }
+    }
+
+    moveBug(pointer) {
+        if (!this.target) {
+            this.target = new Phaser.Math.Vector2();
+        }
+        this.target.x = pointer.worldX;
+        this.target.y = pointer.worldY;
+        this.targetMark.x = pointer.worldX;
+        this.targetMark.y = pointer.worldY;
+        this.targetMark.setVisible(true);
+
+        this.bug.move(this.target);
+
     }
 
     // check and dynamic methods
@@ -198,43 +198,6 @@ export default class WorldScene extends Scene {
             }
         }
     }
-
-    checkPointer() {
-        const pointer = this.input.activePointer;
-        if (pointer.isDown) {
-            if (this.bug.mouseOver) {
-                console.log("chobi");
-            }
-            else {
-                if (!this.target) {
-                    this.target = new Phaser.Math.Vector2();
-                }
-                this.target.x = pointer.worldX;
-                this.target.y = pointer.worldY;
-                this.targetMark.x = pointer.worldX;
-                this.targetMark.y = pointer.worldY;
-                this.targetMark.setVisible(true);
-
-                this.bug.move(this.target);
-            }
-
-
-        }
-    }
-
-    checkGrassCollision() {
-        this.physics.overlap(this.bug, this.grasses, (bug, grass) => {
-            if (this.bug.clicked) {
-                this.bug.eat(grass);
-                this.socket.emit("bug:eat", {
-                    type: "grass",
-                    x: grass.x,
-                    y: grass.y
-                })
-            }
-        });
-    }
-
     notifyBugPosition() {
         this.socket.emit("bug:position", {
             id: this.socket.id,

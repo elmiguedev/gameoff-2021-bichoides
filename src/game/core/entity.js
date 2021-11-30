@@ -12,11 +12,24 @@ export default class Entity extends Phaser.Physics.Arcade.Sprite {
         this.clicked = false;
         this.mouseOver = false;
         this.lastClick = 0;
+        this.triggerZone = null;
     }
 
     createSceneProperties() {
         this.scene.add.existing(this);
         this.scene.physics.add.existing(this);
+    }
+
+    createTriggerZone(radius) {
+        this.triggerZone = this.scene.add.circle(this.x, this.y, radius, 0xffffff, 0.5);
+        this.scene.physics.add.existing(this.triggerZone);
+        this.triggerZone.body.setCircle(radius);
+    }
+
+    addTriggerListener(target, callback) {
+        this.triggerZone.overlap = this.scene.physics.add.overlap(this.triggerZone, target, () => {
+            callback(this);
+        });
     }
 
     createPointerInteraction() {
@@ -42,5 +55,10 @@ export default class Entity extends Phaser.Physics.Arcade.Sprite {
         this.on("pointerout", (e) => {
             this.mouseOver = false;
         })
+    }
+
+    destroy() {
+        super.destroy(true);
+        this.triggerZone.destroy();
     }
 }
